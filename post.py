@@ -48,13 +48,13 @@ def allowed_pds(url):
             and p.port in (None, 443) and p.path in ('', '/') and not p.query and not p.fragment
             and (p.hostname == 'bsky.social' or (p.hostname or '').endswith('.bsky.network')))
 
-def make_record(body, url, date):
+def make_record(body, url, date, label='$5 calculator'):
     p = urllib.parse.urlsplit(url)
     if p.scheme != 'https' or p.hostname != 'payhip.com' or p.username or p.password or p.port:
         raise ValueError('PRODUCT_URL must be the HTTPS Payhip product link.')
     if not p.path.startswith('/b/') or len(p.path) < 4:
         raise ValueError('Use the product URL, e.g. https://payhip.com/b/Ab123.')
-    text = body + '\n\n$5 calculator: ' + url
+    text = body + '\n\n' + label + ': ' + url
     if len(text) > 300 or len(text.encode()) > 3000:
         raise ValueError('Post is too long. Shorten the content or product URL.')
     start = len(text[:text.rfind(url)].encode('utf-8'))
@@ -87,11 +87,13 @@ def publish(record, rkey, handle, password, api=rpc):
                  {**params, 'record': record}, token=session['accessJwt'])
     return 'Published: ' + result['uri']
 
-def daily_rkey(date):
+def daily_rkey(date, clock_id=1023):
     # A valid TID, stable for this campaign's UTC day so retries cannot duplicate it.
     epoch = dt.date(1970, 1, 1)
     micros = (date - epoch).days * 86_400_000_000
-    value = (micros << 10) | 1023
+    if not 0 <= clock_id <= 1023:
+        raise ValueError("Campaign clock ID must be between 0 and 1023.")
+    value = (micros << 10) | clock_id
     alphabet = '234567abcdefghijklmnopqrstuvwxyz'
     return ''.join(alphabet[(value >> shift) & 31] for shift in range(60, -1, -5))
 
@@ -105,15 +107,15 @@ def main():
     start = dt.date.fromisoformat(os.environ['CAMPAIGN_START_DATE'])
     today = dt.datetime.now(dt.timezone.utc).date()
     index = (today - start).days
-    posts = json.loads((ROOT / 'posts.json').read_text())
+    posts = json.loads((ROOT / os.getenv('POSTS_FILE', 'posts.json')).read_text())
     if index < 0:
         print('Campaign has not started.')
         return
     if index >= len(posts):
         print('30-day campaign finished. No post sent. Extend posts.json for another campaign.')
         return
-    record = make_record(posts[index], os.environ['PRODUCT_URL'], today)
-    rkey = daily_rkey(today)
+    record = make_record(posts[index], os.environ['PRODUCT_URL'], today, os.getenv('POST_LABEL', '$5 calculator'))
+    rkey = daily_rkey(today, int(os.getenv('CAMPAIGN_CLOCK_ID', '1023')))
     if args.dry_run:
         print(f'Preview day {index + 1}/{len(posts)}:\n{record["text"]}')
         return
