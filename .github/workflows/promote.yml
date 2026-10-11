@@ -23,7 +23,7 @@ jobs:
     env:
       PRODUCT_URL: ${{ vars.PRODUCT_URL || 'https://payhip.com/b/2EGja' }}
       CAMPAIGN_START_DATE: ${{ vars.CAMPAIGN_START_DATE || '2026-10-11' }}
-      PROMOTION_ENABLED: 'false'
+      PROMOTION_ENABLED: ${{ vars.PROMOTION_ENABLED || 'true' }}
       BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
       BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
       DRY_RUN: ${{ inputs.dry_run }}
