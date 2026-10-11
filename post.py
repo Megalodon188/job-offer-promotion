@@ -64,7 +64,8 @@ def make_record(body, url, date):
                         'features': [{'$type': 'app.bsky.richtext.facet#link', 'uri': url}]}]}
 
 def publish(record, rkey, handle, password, api=rpc):
-    if not handle or not re.fullmatch(r'[a-z]{4}(?:-[a-z]{4}){3}', password):
+    handle, password = handle.strip(), password.strip()
+    if not handle or not re.fullmatch(r'[A-Za-z0-9]{4}(?:-[A-Za-z0-9]{4}){3}', password):
         raise ValueError('Set BSKY_HANDLE and a Bluesky App Password in GitHub Secrets.')
     session = api('https://bsky.social', 'com.atproto.server.createSession',
                   {'identifier': handle.lstrip('@'), 'password': password})
