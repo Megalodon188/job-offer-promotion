@@ -17,3 +17,7 @@ jobs:
         run: python3 post.py
         env:
           PROMOTION_ENABLED: 'false'
+      - name: Preview connected product link
+        run: CAMPAIGN_START_DATE="$(date -u +%F)" python3 post.py --dry-run
+        env:
+          PRODUCT_URL: https://payhip.com/b/2EGja
