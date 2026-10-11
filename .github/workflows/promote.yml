@@ -1,4 +1,4 @@
-# Campaign activation: 2026-10-11; one post per UTC day.
+# Campaign activation: 2026-10-11; valid TID keys prevent daily duplicates.
 name: Daily product promotion
 on:
   push:
