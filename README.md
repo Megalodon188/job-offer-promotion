@@ -49,3 +49,13 @@ Posts describe a desktop tool, and make no earnings, buyer-count or savings guar
 Public demo: https://revision-desk-demo.quietgrass17.chatgpt.site
 
 Revision Desk campaign posts now link to this free check. Its purchase buttons lead to the Payhip product. The demo shows a fictional worked example, accepts local inputs, and has no email gate. Existing published posts are not rewritten. Tags use Bluesky rich-text facets. The marketing page and targeting do not establish buyer demand or guarantee sales.
+
+## Demo resources and reporting
+
+The public demo now includes a free revision-feedback message generator, a worked project-rate guide, a visitor-controlled Bluesky share link, structured metadata, robots.txt and a three-page sitemap. No visitor tracking is installed.
+
+`launch_demo.py` published a one-time introduction on 2026-10-11 and filled empty profile fields and the empty pinned-post slot. It preserves existing profile data and does nothing outside its launch date. The launch workflow is idempotent.
+
+**Revision Desk engagement report** runs Mondays and Thursdays around 19:17 UTC through 2026-11-10. Its GitHub Actions job summary records public follower counts and likes, replies and reposts for matching posts among the latest 100 author-feed entries. It is a snapshot, not a daily change report. It cannot measure impressions, visitors, purchases, refunds or profit. Schedules may be delayed or skipped. Disable the workflow to stop reports.
+
+Report runs: https://github.com/Megalodon188/job-offer-promotion/actions/workflows/engagement-report.yml
