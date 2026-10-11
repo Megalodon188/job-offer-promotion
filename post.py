@@ -50,10 +50,13 @@ def allowed_pds(url):
 
 def make_record(body, url, date, label='$5 calculator'):
     p = urllib.parse.urlsplit(url)
-    if p.scheme != 'https' or p.hostname != 'payhip.com' or p.username or p.password or p.port:
-        raise ValueError('PRODUCT_URL must be the HTTPS Payhip product link.')
-    if not p.path.startswith('/b/') or len(p.path) < 4:
-        raise ValueError('Use the product URL, e.g. https://payhip.com/b/Ab123.')
+    if p.scheme != 'https' or p.username or p.password or p.port:
+        raise ValueError('Use an approved HTTPS product or demo link.')
+    payhip = p.hostname == 'payhip.com' and p.path.startswith('/b/') and len(p.path) >= 4
+    demo = (p.hostname == 'revision-desk-demo.quietgrass17.chatgpt.site'
+            and p.path in ('', '/') and not p.query and not p.fragment)
+    if not (payhip or demo):
+        raise ValueError('Use the Payhip product link or the approved Revision Desk demo.')
     text = body + '\n\n' + label + ': ' + url
     if len(text) > 300 or len(text.encode()) > 3000:
         raise ValueError('Post is too long. Shorten the content or product URL.')
