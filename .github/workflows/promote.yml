@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     env:
-      PRODUCT_URL: ${{ vars.PRODUCT_URL }}
+      PRODUCT_URL: ${{ vars.PRODUCT_URL || 'https://payhip.com/b/2EGja' }}
       CAMPAIGN_START_DATE: ${{ vars.CAMPAIGN_START_DATE }}
       PROMOTION_ENABLED: ${{ vars.PROMOTION_ENABLED }}
       BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
