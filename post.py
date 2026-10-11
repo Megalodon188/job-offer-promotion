@@ -87,6 +87,14 @@ def publish(record, rkey, handle, password, api=rpc):
                  {**params, 'record': record}, token=session['accessJwt'])
     return 'Published: ' + result['uri']
 
+def daily_rkey(date):
+    # A valid TID, stable for this campaign's UTC day so retries cannot duplicate it.
+    epoch = dt.date(1970, 1, 1)
+    micros = (date - epoch).days * 86_400_000_000
+    value = (micros << 10) | 1023
+    alphabet = '234567abcdefghijklmnopqrstuvwxyz'
+    return ''.join(alphabet[(value >> shift) & 31] for shift in range(60, -1, -5))
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true')
@@ -105,7 +113,7 @@ def main():
         print('30-day campaign finished. No post sent. Extend posts.json for another campaign.')
         return
     record = make_record(posts[index], os.environ['PRODUCT_URL'], today)
-    rkey = 'joboffer-' + start.strftime('%Y%m%d') + '-' + str(index + 1)
+    rkey = daily_rkey(today)
     if args.dry_run:
         print(f'Preview day {index + 1}/{len(posts)}:\n{record["text"]}')
         return
