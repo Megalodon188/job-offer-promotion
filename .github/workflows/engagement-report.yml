@@ -2,9 +2,9 @@ name: Revision Desk engagement report
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/engagement-report.yml']
+    paths: ['.github/workflows/engagement-report.yml', 'engagement_report.py']
   schedule:
-    - cron: '17 19 * * 1,4'
+    - cron: '17 15 * * *'
   workflow_dispatch:
 permissions:
   contents: read
