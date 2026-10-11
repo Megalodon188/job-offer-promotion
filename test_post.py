@@ -38,6 +38,15 @@ class PromotionTests(unittest.TestCase):
         for facet in tags:
             i = facet['index']
             self.assertEqual(record['text'].encode()[i['byteStart']:i['byteEnd']],('#'+facet['features'][0]['tag']).encode())
+    def test_demo_campaign_destination(self):
+        url = 'https://revision-desk-demo.quietgrass17.chatgpt.site'
+        for text in json.loads(Path('revision_posts.json').read_text()):
+            record = make_record(text,url,dt.date(2026,10,11),'Free revision check')
+            offset = record['facets'][0]['index']
+            self.assertEqual(record['text'].encode()[offset['byteStart']:offset['byteEnd']],url.encode())
+        for bad in [url+'.evil.example',url+'/unapproved',url+'?unapproved=1']:
+            with self.assertRaises(ValueError):
+                make_record('Test',bad,dt.date(2026,10,11))
     def test_every_post_and_link_offsets(self):
         posts = json.loads(Path('posts.json').read_text())
         self.assertEqual(len(posts), 30)
