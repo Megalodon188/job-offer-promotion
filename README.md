@@ -33,3 +33,13 @@ For a longer campaign, add distinct posts to `posts.json`, with each final post 
 GitHub verifies the tests, disabled posting, and a preview with the connected product link. Tests use fake API responses; a live posting check requires your account secrets. Automated reach and sales are not guaranteed.
 
 Do not upload the paid workbook or customer ZIP to this public repository.
+
+## Revision Desk campaign
+
+Product: https://payhip.com/b/xWm6F
+
+A separate 30-post campaign starts on 2026-10-11 UTC and ends on 2026-11-09. It runs around 22:43 UTC daily from `.github/workflows/revision-promote.yml`. The same account secrets are reused, with separate record keys so the two products do not collide. The existing calculator campaign continues at its original time.
+
+Set the Actions variable `REVISION_PROMOTION_ENABLED=false` or disable **Daily Revision Desk promotion** to pause this campaign. Preview defaults to enabled for manual runs; uncheck it to publish. Both campaigns' tests run before publishing. Missed dates are not caught up.
+
+Posts describe a desktop tool, and make no earnings, buyer-count or savings guarantees. This is promotion to the connected Bluesky account, not proof of buyer demand. Delivery settings, listing price and sales/refund monitoring remain in Payhip. Never upload the paid Revision Desk tool or customer ZIP into this public repository.
