@@ -58,10 +58,16 @@ def make_record(body, url, date, label='$5 calculator'):
     if len(text) > 300 or len(text.encode()) > 3000:
         raise ValueError('Post is too long. Shorten the content or product URL.')
     start = len(text[:text.rfind(url)].encode('utf-8'))
-    return {'$type': COLLECTION, 'text': text, 'langs': ['en'],
+    record = {'$type': COLLECTION, 'text': text, 'langs': ['en'],
             'createdAt': date.isoformat() + 'T18:17:00.000Z',
             'facets': [{'index': {'byteStart': start, 'byteEnd': start + len(url.encode('utf-8'))},
                         'features': [{'$type': 'app.bsky.richtext.facet#link', 'uri': url}]}]}
+    for match in re.finditer(r'(?<![\w])#([A-Za-z][A-Za-z0-9_]{0,63})\b', text):
+        record['facets'].append({
+            'index': {'byteStart': len(text[:match.start()].encode('utf-8')),
+                      'byteEnd': len(text[:match.end()].encode('utf-8'))},
+            'features': [{'$type': 'app.bsky.richtext.facet#tag', 'tag': match.group(1)}]})
+    return record
 
 def publish(record, rkey, handle, password, api=rpc):
     handle, password = handle.strip(), password.strip()
