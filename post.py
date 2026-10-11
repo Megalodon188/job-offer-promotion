@@ -1,0 +1,118 @@
+"""Post one dated promotion to your own Bluesky account. No dependencies."""
+import argparse
+import datetime as dt
+import json
+import os
+from pathlib import Path
+import re
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+
+ROOT = Path(__file__).resolve().parent
+COLLECTION = 'app.bsky.feed.post'
+
+class APIError(Exception):
+    def __init__(self, status, code):
+        super().__init__(f'Bluesky HTTP {status}: {code}')
+        self.status, self.code = status, code
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args):
+        return None
+
+def rpc(host, method, data=None, token=None, params=None):
+    url = host + '/xrpc/' + method
+    if params:
+        url += '?' + urllib.parse.urlencode(params)
+    headers = {'Content-Type': 'application/json', 'User-Agent': 'JobOfferPromotion/1.0'}
+    if token:
+        headers['Authorization'] = 'Bearer ' + token
+    body = json.dumps(data).encode() if data is not None else None
+    request = urllib.request.Request(url, data=body, headers=headers)
+    try:
+        with urllib.request.build_opener(NoRedirect()).open(request, timeout=30) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        try:
+            code = json.loads(exc.read()).get('error', 'RequestFailed')
+        except (ValueError, UnicodeDecodeError):
+            code = 'RequestFailed'
+        # Never print authentication response bodies or tokens.
+        raise APIError(exc.code, code) from None
+
+def allowed_pds(url):
+    p = urllib.parse.urlsplit(url)
+    return (p.scheme == 'https' and not p.username and not p.password
+            and p.port in (None, 443) and p.path in ('', '/') and not p.query and not p.fragment
+            and (p.hostname == 'bsky.social' or (p.hostname or '').endswith('.bsky.network')))
+
+def make_record(body, url, date):
+    p = urllib.parse.urlsplit(url)
+    if p.scheme != 'https' or p.hostname != 'payhip.com' or p.username or p.password or p.port:
+        raise ValueError('PRODUCT_URL must be the HTTPS Payhip product link.')
+    if not p.path.startswith('/b/') or len(p.path) < 4:
+        raise ValueError('Use the product URL, e.g. https://payhip.com/b/Ab123.')
+    text = body + '\n\n$5 calculator: ' + url
+    if len(text) > 300 or len(text.encode()) > 3000:
+        raise ValueError('Post is too long. Shorten the content or product URL.')
+    start = len(text[:text.rfind(url)].encode('utf-8'))
+    return {'$type': COLLECTION, 'text': text, 'langs': ['en'],
+            'createdAt': date.isoformat() + 'T18:17:00.000Z',
+            'facets': [{'index': {'byteStart': start, 'byteEnd': start + len(url.encode('utf-8'))},
+                        'features': [{'$type': 'app.bsky.richtext.facet#link', 'uri': url}]}]}
+
+def publish(record, rkey, handle, password, api=rpc):
+    if not handle or not re.fullmatch(r'[a-z]{4}(?:-[a-z]{4}){3}', password):
+        raise ValueError('Set BSKY_HANDLE and a Bluesky App Password in GitHub Secrets.')
+    session = api('https://bsky.social', 'com.atproto.server.createSession',
+                  {'identifier': handle.lstrip('@'), 'password': password})
+    pds = 'https://bsky.social'
+    for service in session.get('didDoc', {}).get('service', []):
+        if service.get('type') == 'AtprotoPersonalDataServer':
+            pds = service['serviceEndpoint'].rstrip('/')
+            break
+    if not allowed_pds(pds):
+        raise ValueError('This starter supports Bluesky-hosted accounts only.')
+    params = {'repo': session['did'], 'collection': COLLECTION, 'rkey': rkey}
+    try:
+        api(pds, 'com.atproto.repo.getRecord', token=session['accessJwt'], params=params)
+        return 'Already posted for this campaign day. No duplicate created.'
+    except APIError as exc:
+        if exc.code != 'RecordNotFound':
+            raise
+    result = api(pds, 'com.atproto.repo.createRecord',
+                 {**params, 'record': record}, token=session['accessJwt'])
+    return 'Published: ' + result['uri']
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dry-run', action='store_true')
+    args = parser.parse_args()
+    if not args.dry_run and os.getenv('PROMOTION_ENABLED', '').lower() != 'true':
+        print('Disabled. Set PROMOTION_ENABLED=true after previewing the posts.')
+        return
+    start = dt.date.fromisoformat(os.environ['CAMPAIGN_START_DATE'])
+    today = dt.datetime.now(dt.timezone.utc).date()
+    index = (today - start).days
+    posts = json.loads((ROOT / 'posts.json').read_text())
+    if index < 0:
+        print('Campaign has not started.')
+        return
+    if index >= len(posts):
+        print('30-day campaign finished. No post sent. Extend posts.json for another campaign.')
+        return
+    record = make_record(posts[index], os.environ['PRODUCT_URL'], today)
+    rkey = 'joboffer-' + start.strftime('%Y%m%d') + '-' + str(index + 1)
+    if args.dry_run:
+        print(f'Preview day {index + 1}/{len(posts)}:\n{record["text"]}')
+        return
+    print(publish(record, rkey, os.getenv('BSKY_HANDLE', ''), os.getenv('BSKY_APP_PASSWORD', '')))
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (APIError, ValueError, KeyError, OSError) as exc:
+        print(f'Posting stopped: {exc}', file=sys.stderr)
+        sys.exit(1)
