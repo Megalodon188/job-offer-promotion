@@ -1,0 +1,45 @@
+name: Daily Revision Desk promotion
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/revision-promote.yml']
+  schedule:
+    - cron: '43 22 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview only (uncheck to publish today's post)
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: revision-desk-promotion
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      PRODUCT_URL: https://payhip.com/b/xWm6F
+      POST_LABEL: Revision Desk (desktop)
+      POSTS_FILE: revision_posts.json
+      CAMPAIGN_CLOCK_ID: '1022'
+      CAMPAIGN_START_DATE: '2026-10-11'
+      PROMOTION_ENABLED: ${{ vars.REVISION_PROMOTION_ENABLED || 'true' }}
+      BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+      BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify both campaigns before posting
+        run: python3 -m unittest -v test_post.py
+      - name: Publish or preview today's Revision Desk post
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            python3 post.py --dry-run
+          else
+            python3 post.py
+          fi
