@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     env:
-      PRODUCT_URL: https://payhip.com/b/xWm6F
-      POST_LABEL: Revision Desk (desktop)
+      PRODUCT_URL: https://revision-desk-demo.quietgrass17.chatgpt.site
+      POST_LABEL: Free revision check
       POSTS_FILE: revision_posts.json
       CAMPAIGN_CLOCK_ID: '1022'
       CAMPAIGN_START_DATE: '2026-10-11'
