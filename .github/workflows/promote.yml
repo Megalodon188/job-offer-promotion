@@ -1,3 +1,4 @@
+# Campaign activation: 2026-10-11; one post per UTC day.
 name: Daily product promotion
 on:
   push:
