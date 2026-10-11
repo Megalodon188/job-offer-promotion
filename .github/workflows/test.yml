@@ -1,0 +1,19 @@
+name: Verify promotion code
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest -v test_post.py
+      - name: Check disabled posting
+        run: python3 post.py
+        env:
+          PROMOTION_ENABLED: 'false'
