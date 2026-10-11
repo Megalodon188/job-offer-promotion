@@ -1,0 +1,25 @@
+name: Introduce free demo
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/launch-demo.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: revision-demo-introduction
+  cancel-in-progress: false
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest -v test_post.py
+      - run: python3 launch_demo.py --dry-run
+      - run: python3 launch_demo.py
+        env:
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
