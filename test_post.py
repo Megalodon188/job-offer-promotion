@@ -31,7 +31,8 @@ class PromotionTests(unittest.TestCase):
                 raise APIError(400,'RecordNotFound')
             return {'uri':'at://did:plc:test/app.bsky.feed.post/joboffer-20261011-1'}
         record=make_record('Test','https://payhip.com/b/Ab123',dt.date(2026,10,11))
-        self.assertTrue(publish(record,'joboffer-20261011-1','user.bsky.social','aaaa-bbbb-cccc-dddd',api=fake).startswith('Published'))
+        self.assertTrue(publish(record,'joboffer-20261011-1',' user.bsky.social ',' ab12-cd34-ef56-gh78 ',api=fake).startswith('Published'))
+        self.assertEqual(calls[0][2], {'identifier':'user.bsky.social','password':'ab12-cd34-ef56-gh78'})
         self.assertEqual(calls[-1][2]['rkey'],'joboffer-20261011-1')
         self.assertEqual(calls[-1][0],'https://test.host.bsky.network')
         def existing(host, method, data=None, **kwargs):
