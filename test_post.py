@@ -16,6 +16,20 @@ class PromotionTests(unittest.TestCase):
         self.assertEqual(decoded >> 10, (day - dt.date(1970,1,1)).days * 86_400_000_000)
         self.assertEqual(key, daily_rkey(day))
         self.assertNotEqual(key, daily_rkey(day + dt.timedelta(days=1)))
+    def test_revision_campaign_and_isolation(self):
+        day = dt.date(2026, 10, 11)
+        self.assertNotEqual(daily_rkey(day,1022), daily_rkey(day))
+        self.assertEqual(daily_rkey(day,1022), daily_rkey(day,1022))
+        posts = json.loads(Path('revision_posts.json').read_text())
+        self.assertEqual(len(posts),30)
+        self.assertEqual(len(set(posts)),30)
+        url = 'https://payhip.com/b/xWm6F'
+        for text in posts:
+            record = make_record(text,url,day,'Revision Desk (desktop)')
+            self.assertIn('Revision Desk (desktop): '+url,record['text'])
+            self.assertNotIn('$5 calculator',record['text'])
+            offset = record['facets'][0]['index']
+            self.assertEqual(record['text'].encode()[offset['byteStart']:offset['byteEnd']],url.encode())
     def test_every_post_and_link_offsets(self):
         posts = json.loads(Path('posts.json').read_text())
         self.assertEqual(len(posts), 30)
