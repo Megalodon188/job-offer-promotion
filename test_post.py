@@ -30,6 +30,14 @@ class PromotionTests(unittest.TestCase):
             self.assertNotIn('$5 calculator',record['text'])
             offset = record['facets'][0]['index']
             self.assertEqual(record['text'].encode()[offset['byteStart']:offset['byteEnd']],url.encode())
+    def test_hashtag_byte_offsets(self):
+        record = make_record('café #VideoEditing #Freelance','https://payhip.com/b/xWm6F',dt.date(2026,10,11),'Revision Desk')
+        tags = record['facets'][1:]
+        self.assertEqual(len(tags),2)
+        self.assertEqual(tags[0]['features'][0]['tag'],'VideoEditing')
+        for facet in tags:
+            i = facet['index']
+            self.assertEqual(record['text'].encode()[i['byteStart']:i['byteEnd']],('#'+facet['features'][0]['tag']).encode())
     def test_every_post_and_link_offsets(self):
         posts = json.loads(Path('posts.json').read_text())
         self.assertEqual(len(posts), 30)
