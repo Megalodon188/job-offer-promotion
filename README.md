@@ -2,7 +2,7 @@
 
 Product: https://payhip.com/b/2EGja
 
-The code and daily workflow are installed. This repository contains a 30-day campaign for the $5 calculator, posting to your own Bluesky account with a clickable product link. It does not send DMs or replies. Posting remains disabled until the account is connected and the campaign is activated.
+The code and daily workflow are installed. This repository contains a 30-day campaign for the $5 calculator, posting to your own Bluesky account with a clickable product link. It does not send DMs or replies. The campaign is enabled with a UTC start date of 2026-10-11. It posts once per campaign day through 2026-11-09.
 
 ## Connect your account
 
@@ -10,13 +10,13 @@ The code and daily workflow are installed. This repository contains a 30-day cam
 2. Open https://github.com/Megalodon188/job-offer-promotion/settings/secrets/actions and add two repository secrets:
    - `BSKY_HANDLE`: your full handle, such as `name.bsky.social`.
    - `BSKY_APP_PASSWORD`: the dedicated Bluesky App Password.
-3. Tell the assistant the secrets are saved. The assistant can set the campaign start date and enable posting in the workflow. Alternatively, add Actions variables `CAMPAIGN_START_DATE` (UTC date in YYYY-MM-DD format) and `PROMOTION_ENABLED` (`true`) yourself. The product link is already configured; `PRODUCT_URL` is an optional override.
+3. The campaign start date and enabled state are configured in the workflow. Optional Actions variables `CAMPAIGN_START_DATE`, `PROMOTION_ENABLED`, and `PRODUCT_URL` override those defaults. Use `PROMOTION_ENABLED=false` to pause posting.
 4. Check that your Payhip price is $5, as advertised in the posts. In Actions > Daily product promotion > Run workflow, leave Preview checked to inspect a post without authenticating or publishing. To publish after activation, uncheck Preview, or wait for the scheduled run.
 5. Check the first post on your account and click its link. Retrying the same campaign day does not create a second post.
 
 ## What runs
 
-The workflow runs at about 18:17 UTC daily. Scheduled runs can be delayed or dropped. The campaign day is the UTC date minus the start date; missed days are not caught up. Before the start date and after the 30 posts, it posts nothing.
+The workflow runs at about 18:17 UTC daily. Updating the promotion workflow on main also triggers a run; the same-day duplicate check still applies. Scheduled runs can be delayed or dropped. The campaign day is the UTC date minus the start date; missed days are not caught up. Before the start date and after the 30 posts, it posts nothing.
 
 The workflow uses a standard public-repository Ubuntu runner, a three-minute timeout, and read-only repository permissions. There are no packages, paid advertising, AI API calls, caches or artifact uploads. GitHub can disable public scheduled workflows after 60 days without repository activity; this campaign ends first.
 
