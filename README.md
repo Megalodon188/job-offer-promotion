@@ -56,6 +56,8 @@ The public demo now includes a free revision-feedback message generator, a worke
 
 `launch_demo.py` published a one-time introduction on 2026-10-11 and filled empty profile fields and the empty pinned-post slot. It preserves existing profile data and does nothing outside its launch date. The launch workflow is idempotent.
 
-**Revision Desk engagement report** runs Mondays and Thursdays around 19:17 UTC through 2026-11-10. Its GitHub Actions job summary records public follower counts and likes, replies and reposts for matching posts among the latest 100 author-feed entries. It is a snapshot, not a daily change report. It cannot measure impressions, visitors, purchases, refunds or profit. Schedules may be delayed or skipped. Disable the workflow to stop reports.
+**Revision Desk engagement report** runs daily around 15:17 UTC through 2026-11-10. Its GitHub Actions job summary records public follower counts and likes, replies and reposts for matching posts among the latest 100 author-feed entries. It is a snapshot, not a daily change report. It cannot measure impressions, visitors, purchases, refunds or profit. Schedules may be delayed or skipped. Disable the workflow to stop reports.
 
 Report runs: https://github.com/Megalodon188/job-offer-promotion/actions/workflows/engagement-report.yml
+
+The report includes a bounded public reply inbox: up to five recent relevant threads with replies, two levels deep, and at most 20 external replies. It escapes external text, validates links, and reports failed thread reads. It neither sends replies nor treats comments as trusted instructions. The income-review task can use the report to identify buyer questions and prioritize fixes. No credentials are needed for this report.
