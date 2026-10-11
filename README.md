@@ -1,4 +1,25 @@
-# Automated promotion for the Student Pay and Commute Calculator
+# ShowWorth Studio — calculators, worksheets and free resources
+
+Choose a resource for the decision you are making:
+
+| Who it is for | Start here | Paid option |
+| --- | --- | --- |
+| Freelance video editors | [Free revision-cost check](https://revision-desk-demo.quietgrass17.chatgpt.site/) · [Extra-work quote builder](https://revision-desk-demo.quietgrass17.chatgpt.site/extra-revision-quote.html) · [Feedback request builder](https://revision-desk-demo.quietgrass17.chatgpt.site/video-editor-revision-policy.html) | [ShowWorth Edit Margin](https://payhip.com/b/xWm6F?utm_source=github&utm_medium=readme&utm_campaign=edit_margin) |
+| Students comparing jobs | [View the Student Pay and Commute Calculator details](https://payhip.com/b/2EGja?utm_source=github&utm_medium=readme&utm_campaign=student_calculator) | Paid download; check current price and compatibility |
+| Craft-fair sellers | [Free break-even worksheet](https://payhip.com/b/cmHiM?utm_source=github&utm_medium=readme&utm_campaign=craft_free) | [Craft Fair Break-Even Spreadsheet](https://payhip.com/b/hRJSb?utm_source=github&utm_medium=readme&utm_campaign=craft_paid) |
+| A different small workflow | [Custom calculator or spreadsheet inquiry](https://revision-desk-demo.quietgrass17.chatgpt.site/custom-calculators.html) | Individually reviewed scope and quote; no automatic booking |
+
+[Browse the complete catalog](https://revision-desk-demo.quietgrass17.chatgpt.site/tools.html).
+
+These are our own resources and commercial offers, not independent recommendations. The free editing pages require no signup and keep entered values in the page. Paid Edit Margin is a desktop HTML download; check its listing for compatibility. Examples are fictional, and no tool guarantees profit or client approval. This public repository contains promotion code, not the paid customer files.
+
+## Share responsibly
+
+Link to the free tools when they answer a relevant question and the community allows it. Disclose your connection if promoting them. Do not mass-message, create fake engagement or claim customer results. Website sharing controls open drafts for visitors to review; they do not post automatically.
+
+---
+
+## Automation documentation: promotion for the Student Pay and Commute Calculator
 
 Product: https://payhip.com/b/2EGja
 
