@@ -43,3 +43,9 @@ A separate 30-post campaign starts on 2026-10-11 UTC and ends on 2026-11-09. It 
 Set the Actions variable `REVISION_PROMOTION_ENABLED=false` or disable **Daily Revision Desk promotion** to pause this campaign. Preview defaults to enabled for manual runs; uncheck it to publish. Both campaigns' tests run before publishing. Missed dates are not caught up.
 
 Posts describe a desktop tool, and make no earnings, buyer-count or savings guarantees. This is promotion to the connected Bluesky account, not proof of buyer demand. Delivery settings, listing price and sales/refund monitoring remain in Payhip. Never upload the paid Revision Desk tool or customer ZIP into this public repository.
+
+## Free Revision Desk demo
+
+Public demo: https://revision-desk-demo.quietgrass17.chatgpt.site
+
+Revision Desk campaign posts now link to this free check. Its purchase buttons lead to the Payhip product. The demo shows a fictional worked example, accepts local inputs, and has no email gate. Existing published posts are not rewritten. Tags use Bluesky rich-text facets. The marketing page and targeting do not establish buyer demand or guarantee sales.
