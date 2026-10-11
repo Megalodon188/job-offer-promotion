@@ -1,0 +1,37 @@
+name: Daily product promotion
+on:
+  schedule:
+    - cron: '17 18 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview only (uncheck to publish today's post)
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: job-offer-promotion
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      PRODUCT_URL: ${{ vars.PRODUCT_URL }}
+      CAMPAIGN_START_DATE: ${{ vars.CAMPAIGN_START_DATE }}
+      PROMOTION_ENABLED: ${{ vars.PROMOTION_ENABLED }}
+      BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+      BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Post today's promotion
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            python3 post.py --dry-run
+          else
+            python3 post.py
+          fi
