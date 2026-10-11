@@ -108,6 +108,7 @@ def main():
     if args.dry_run:
         print(f'Preview day {index + 1}/{len(posts)}:\n{record["text"]}')
         return
+    record['createdAt'] = dt.datetime.now(dt.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
     print(publish(record, rkey, os.getenv('BSKY_HANDLE', ''), os.getenv('BSKY_APP_PASSWORD', '')))
 
 if __name__ == '__main__':
