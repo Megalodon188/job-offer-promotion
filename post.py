@@ -14,8 +14,8 @@ ROOT = Path(__file__).resolve().parent
 COLLECTION = 'app.bsky.feed.post'
 
 class APIError(Exception):
-    def __init__(self, status, code):
-        super().__init__(f'Bluesky HTTP {status}: {code}')
+    def __init__(self, status, code, method=None):
+        super().__init__(f'Bluesky HTTP {status}: {code}' + (f' during {method}' if method else ''))
         self.status, self.code = status, code
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -40,7 +40,7 @@ def rpc(host, method, data=None, token=None, params=None):
         except (ValueError, UnicodeDecodeError):
             code = 'RequestFailed'
         # Never print authentication response bodies or tokens.
-        raise APIError(exc.code, code) from None
+        raise APIError(exc.code, code, method) from None
 
 def allowed_pds(url):
     p = urllib.parse.urlsplit(url)
