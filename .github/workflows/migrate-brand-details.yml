@@ -2,7 +2,7 @@ name: Align ShowWorth profile details
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/migrate-brand-details.yml']
+    paths: ['.github/workflows/migrate-brand-details.yml', 'migrate_brand_details.py']
   workflow_dispatch:
 permissions:
   contents: read
