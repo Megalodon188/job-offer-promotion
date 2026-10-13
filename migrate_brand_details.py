@@ -1,4 +1,4 @@
-"""One-time exact-match migration of our own Bluesky bio and pinned introduction."""
+"""Idempotent exact-match migration of our own Bluesky bio and pinned introduction."""
 import datetime as dt
 import os
 from post import allowed_pds, daily_rkey, make_record, rpc
@@ -42,23 +42,34 @@ def main():
     post = dict(post_current['value'])
     old_text = make_record(OLD_BODY, DEMO, dt.date(2026, 10, 11), 'Free tool')['text']
     new_record = make_record(NEW_BODY, DEMO, dt.date(2026, 10, 11), 'Free ShowWorth tools')
-    if profile.get('description') == NEW_DESCRIPTION and post.get('text') == new_record['text']:
-        print('ShowWorth bio and pinned introduction already aligned.')
+    if profile.get('description') not in (OLD_DESCRIPTION, NEW_DESCRIPTION):
+        raise ValueError('Bio was independently changed; refusing to overwrite')
+    if post.get('text') not in (old_text, new_record['text']):
+        raise ValueError('Pinned introduction was independently changed; refusing to overwrite')
+    if post.get('text') == old_text:
+        new_record['createdAt'] = post['createdAt']
+        changed_post = rpc(pds, 'com.atproto.repo.putRecord',
+                           {**post_params, 'swapRecord': post_current['cid'], 'record': new_record},
+                           token=token)
+        post_uri, post_cid = changed_post['uri'], changed_post['cid']
+    else:
+        post_uri, post_cid = post_current['uri'], post_current['cid']
+    desired_pin = {'uri': post_uri, 'cid': post_cid}
+    if profile.get('description') == NEW_DESCRIPTION and profile.get('pinnedPost') == desired_pin:
+        print('ShowWorth bio, introduction and pin reference already aligned.')
         return
-    if profile.get('description') != OLD_DESCRIPTION or post.get('text') != old_text:
-        raise ValueError('Bio or pinned introduction was independently changed; refusing to overwrite')
-    new_record['createdAt'] = post['createdAt']
-    rpc(pds, 'com.atproto.repo.putRecord',
-        {**post_params, 'swapRecord': post_current['cid'], 'record': new_record}, token=token)
     profile['description'] = NEW_DESCRIPTION
+    profile['pinnedPost'] = desired_pin
     rpc(pds, 'com.atproto.repo.putRecord',
         {**profile_params, 'swapRecord': profile_current['cid'], 'record': profile}, token=token)
     verified_profile = rpc(pds, 'com.atproto.repo.getRecord', token=token, params=profile_params)
     verified_post = rpc(pds, 'com.atproto.repo.getRecord', token=token, params=post_params)
+    expected_pin = {'uri': verified_post['uri'], 'cid': verified_post['cid']}
     if (verified_profile['value'].get('description') != NEW_DESCRIPTION or
+            verified_profile['value'].get('pinnedPost') != expected_pin or
             verified_post['value'].get('text') != new_record['text']):
         raise ValueError('Migration verification failed')
-    print('Verified ShowWorth bio and pinned introduction; URI and creation time preserved.')
+    print('Verified ShowWorth bio, introduction and current pin reference.')
 
 if __name__ == '__main__':
     main()
